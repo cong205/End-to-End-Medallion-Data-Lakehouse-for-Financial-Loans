@@ -3,17 +3,23 @@ Dự án xây dựng kiến trúc Data Lakehouse từ đầu đến cuối theo 
 <img width="1272" height="409" alt="{A3C2718C-ACCF-4870-A4C4-DF6FF15E80B7}" src="https://github.com/user-attachments/assets/cf0a962c-4bb7-41a6-ba4a-d81d7e015424" />
 ## Summary
 ### 1. System Overview
--Hệ thống chịu trách nhiệm tự động hóa luồng xử lý dữ liệu (Data Pipeline)
--Làm sạch và làm giàu data, loại bỏ các cột không cần thiết cho ml và report, xử lý các giá trị null,...
+Hệ thống chịu trách nhiệm tự động hóa luồng xử lý dữ liệu (Data Pipeline). 
+
+Làm sạch và làm giàu data, loại bỏ các cột không cần thiết cho ml và report, xử lý các giá trị null,...
 ### 2. Technologies Used
--Data Platform: Databricks
--Data Processing & Storage: Apache Spark (PySpark), Delta Lake
--Programming Language: Python
--Development Tools: Databricks Notebooks, NotebookLM
--Data Visualization: Dashboard
+Data Platform: Databricks
+
+Data Processing & Storage: Apache Spark (PySpark), Delta Lake
+
+Programming Language: Python
+
+Development Tools: Databricks Notebooks, NotebookLM
+
+Data Visualization: Dashboard
 ## Installation and Setup
--Trước khi bắt đầu, hãy đảm bảo bạn đã chuẩn bị 1 tài khoản **Databricks** (bản free là đủ)
--Sau khi hoàn thành các bước dưới đây bạn có thể thưc hiện machine_learning và reporting 
+Trước khi bắt đầu, hãy đảm bảo bạn đã chuẩn bị 1 tài khoản **Databricks** (bản free là đủ)
+
+Sau khi hoàn thành các bước dưới đây bạn có thể thưc hiện machine_learning và reporting 
 ### Bước 1: Kết nối GitHub với Databricks
 Để quản lý mã nguồn trực tiếp từ GitHub trên Databricks, bạn cần thiết lập Personal Access Token (PAT):
 1. Trên **GitHub**: Vào `Settings`(settings ở profile) -> `Developer settings` -> `Personal access tokens` -> `Tokens (classic)`.
