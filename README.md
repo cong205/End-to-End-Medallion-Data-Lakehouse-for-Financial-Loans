@@ -51,5 +51,7 @@ Sau khi hoàn thành các bước dưới đây bạn có thể thưc hiện mac
    * **Path:** Chọn file `03_Gold_ETL`.
 ### Bước 4: Chạy Pipeline (nhấn run now)
 
+## Link Databricks
+https://www.databricks.com/
 ## Link dataset from Kaggle 
 https://www.kaggle.com/datasets/adarshsng/lending-club-loan-data-csv
