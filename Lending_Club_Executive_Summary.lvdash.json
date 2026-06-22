@@ -1,0 +1,786 @@
+{
+  "datasets": [
+    {
+      "name": "59d476f5",
+      "displayName": "master_loan_dataset",
+      "queryLines": [
+        "SELECT\n",
+        "  f.loan_id,\n",
+        "  f.disbursement_date,\n",
+        "  f.loan_status,\n",
+        "  f.loan_amount,\n",
+        "  f.funded_amount,\n",
+        "  f.total_payment_received,\n",
+        "  f.outstanding_principal,\n",
+        "  f.total_interest_received,\n",
+        "  f.total_late_fees_received,\n",
+        "  b.employment_title,\n",
+        "  b.employment_length_years,\n",
+        "  b.home_ownership,\n",
+        "  b.annual_income,\n",
+        "  b.address_state,\n",
+        "  b.dti,\n",
+        "  b.has_prior_delinq,\n",
+        "  l.grade,\n",
+        "  l.loan_term_months,\n",
+        "  l.interest_rate,\n",
+        "  l.loan_purpose\n",
+        "FROM\n",
+        "  workspace.gold.fact_loans f\n",
+        "    LEFT JOIN workspace.gold.dim_borrower b\n",
+        "      ON f.member_id = b.member_id\n",
+        "    LEFT JOIN workspace.gold.dim_loan_info l\n",
+        "      ON f.loan_id = l.loan_id"
+      ],
+      "columns": [
+        {
+          "displayName": "total_charged_off",
+          "description": "Total funded amount for charged off loans",
+          "expression": "SUM(CASE WHEN `loan_status` = 'Charged Off' THEN `funded_amount` ELSE 0 END)"
+        },
+        {
+          "displayName": "bad_debt_ratio_pct",
+          "description": "Bad debt ratio as percentage",
+          "expression": "(SUM(CASE WHEN `loan_status` = 'Charged Off' THEN `funded_amount` ELSE 0 END) * 100.0) / SUM(`funded_amount`)"
+        }
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    },
+    {
+      "name": "blacklist_top_100",
+      "displayName": "Top 100 Blacklist",
+      "queryLines": [
+        "SELECT\n",
+        "  f.loan_id,\n",
+        "  f.disbursement_date,\n",
+        "  f.loan_status,\n",
+        "  f.loan_amount,\n",
+        "  f.funded_amount,\n",
+        "  f.total_payment_received,\n",
+        "  f.outstanding_principal,\n",
+        "  f.total_interest_received,\n",
+        "  f.total_late_fees_received,\n",
+        "  b.employment_title,\n",
+        "  b.employment_length_years,\n",
+        "  b.home_ownership,\n",
+        "  b.annual_income,\n",
+        "  b.address_state,\n",
+        "  b.dti,\n",
+        "  b.has_prior_delinq,\n",
+        "  l.grade,\n",
+        "  l.loan_term_months,\n",
+        "  l.interest_rate,\n",
+        "  l.loan_purpose\n",
+        "FROM\n",
+        "  workspace.gold.fact_loans f\n",
+        "    LEFT JOIN workspace.gold.dim_borrower b\n",
+        "      ON f.member_id = b.member_id\n",
+        "    LEFT JOIN workspace.gold.dim_loan_info l\n",
+        "      ON f.loan_id = l.loan_id\n",
+        "WHERE\n",
+        "  f.loan_status = 'Charged Off'\n",
+        "ORDER BY\n",
+        "  f.outstanding_principal DESC\n",
+        "LIMIT 100"
+      ],
+      "catalog": "workspace",
+      "schema": "gold"
+    }
+  ],
+  "pages": [
+    {
+      "name": "f29c1281",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "filter-by-credit-grade",
+            "queries": [
+              {
+                "name": "dashboards/01f16d723183145587fd066f8e12953c/datasets/01f16d80176a170cb7c4f3922a31f0ea_grade",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "grade",
+                      "expression": "`grade`"
+                    },
+                    {
+                      "name": "grade_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Filter by Credit Grade"
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "grade",
+                    "queryName": "dashboards/01f16d723183145587fd066f8e12953c/datasets/01f16d80176a170cb7c4f3922a31f0ea_grade"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "8c4e538e",
+      "displayName": "Page 1",
+      "layout": [
+        {
+          "widget": {
+            "name": "total-funded-volume",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "sum(funded_amount)",
+                      "expression": "SUM(`funded_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Total Funded Volume",
+                "description": "Tổng tiền đã giải ngân"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(funded_amount)",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    },
+                    "significantFigures": {
+                      "type": "all"
+                    },
+                    "negativeSign": "standard"
+                  },
+                  "style": {
+                    "rules": [
+                      {
+                        "condition": {
+                          "operator": ">="
+                        },
+                        "color": "#00A972"
+                      },
+                      {
+                        "condition": {
+                          "operator": ">="
+                        },
+                        "color": "#00A972"
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "bad-debt-by-state",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "sum(funded_amount)",
+                      "expression": "SUM(`funded_amount`)"
+                    },
+                    {
+                      "name": "address_state",
+                      "expression": "`address_state`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "description": "Nợ xấu theo Bang",
+                "title": "Bad debt by State"
+              },
+              "widgetType": "choropleth-map",
+              "encodings": {
+                "color": {
+                  "fieldName": "sum(funded_amount)",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "single-hue",
+                      "baseColor": {
+                        "themeColorType": "visualizationColors",
+                        "position": 4
+                      }
+                    }
+                  }
+                },
+                "region": {
+                  "regionType": "mapbox-v4-admin",
+                  "admin0": {
+                    "type": "value",
+                    "value": "United States",
+                    "geographicRole": "admin0-name"
+                  },
+                  "admin1": {
+                    "fieldName": "address_state",
+                    "type": "field",
+                    "geographicRole": "admin1-name"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "monthly-disbursement-default-trend",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "loan_status",
+                      "expression": "`loan_status`"
+                    },
+                    {
+                      "name": "monthly(disbursement_date)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `disbursement_date`)"
+                    },
+                    {
+                      "name": "sum(funded_amount)",
+                      "expression": "SUM(`funded_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Monthly Disbursement & Default Trend",
+                "description": "Xu hướng giải ngân hàng tháng và nợ xấu"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(disbursement_date)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(funded_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "loan_status",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 7,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "risk-concentration-loan-purpose",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "loan_status",
+                      "expression": "`loan_status`"
+                    },
+                    {
+                      "name": "sum(funded_amount)",
+                      "expression": "SUM(`funded_amount`)"
+                    },
+                    {
+                      "name": "loan_purpose",
+                      "expression": "`loan_purpose`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Risk Concentration by Loan Purpose",
+                "description": "Khách hàng vay tiền để làm gì thì tỷ lệ bùng nợ cao nhất"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(funded_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "loan_purpose",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "color": {
+                  "fieldName": "loan_status",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "filter-credit-grade",
+            "queries": [
+              {
+                "name": "dashboards/01f16d723183145587fd066f8e12953c/datasets/01f16d80176a170cb7c4f3922a31f0ea_grade",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "grade",
+                      "expression": "`grade`"
+                    },
+                    {
+                      "name": "grade_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Filter by Grade"
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "grade",
+                    "queryName": "dashboards/01f16d723183145587fd066f8e12953c/datasets/01f16d80176a170cb7c4f3922a31f0ea_grade"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "total-interest-card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "sum(total_interest_received)",
+                      "expression": "SUM(`total_interest_received`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Total Interest Revenue",
+                "description": "Tổng lãi thu được từ tất cả khoản vay"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_interest_received)",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "bad-debt-ratio-card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "measure(bad_debt_ratio_pct)",
+                      "expression": "MEASURE(`bad_debt_ratio_pct`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Bad Debt Ratio",
+                "description": "Tỷ lệ nợ xấu (%) - Charged Off / Total Funded"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(bad_debt_ratio_pct)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    }
+                  },
+                  "formatTemplate": "{{ @formatted }}%",
+                  "style": {
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "11"
+                          },
+                          "operator": ">="
+                        },
+                        "color": "#FF3621"
+                      },
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "8"
+                          },
+                          "operator": ">="
+                        },
+                        "color": "#FFB800"
+                      },
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "8"
+                          },
+                          "operator": "<"
+                        },
+                        "color": "#00A972"
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "prior-delinq-donut",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "59d476f5",
+                  "fields": [
+                    {
+                      "name": "sum(funded_amount)",
+                      "expression": "SUM(`funded_amount`)"
+                    },
+                    {
+                      "name": "has_prior_delinq",
+                      "expression": "`has_prior_delinq`"
+                    },
+                    {
+                      "name": "loan_status",
+                      "expression": "`loan_status`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Default Volume by Prior Delinquency",
+                "description": "Phân bố khách hàng có/không có lịch sử nợ xấu"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(funded_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "has_prior_delinq",
+                  "scale": {
+                    "type": "quantitative",
+                    "domain": {
+                      "min": 0,
+                      "max": 1
+                    },
+                    "reverse": false
+                  }
+                },
+                "extra": [
+                  {
+                    "fieldName": "loan_status"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 2,
+            "width": 5,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "blacklist-table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "blacklist_top_100",
+                  "fields": [
+                    {
+                      "name": "loan_id",
+                      "expression": "`loan_id`"
+                    },
+                    {
+                      "name": "employment_title",
+                      "expression": "`employment_title`"
+                    },
+                    {
+                      "name": "grade",
+                      "expression": "`grade`"
+                    },
+                    {
+                      "name": "loan_status",
+                      "expression": "`loan_status`"
+                    },
+                    {
+                      "name": "outstanding_principal",
+                      "expression": "`outstanding_principal`"
+                    },
+                    {
+                      "name": "address_state",
+                      "expression": "`address_state`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Top 100 Blacklist",
+                "description": "Danh sách đen Top 100 khách hàng có nợ xấu cao nhất, sắp xếp theo Outstanding Principal giảm dần"
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "loan_id",
+                    "useForSearch": true
+                  },
+                  {
+                    "fieldName": "employment_title",
+                    "useForSearch": true
+                  },
+                  {
+                    "fieldName": "grade",
+                    "useForSearch": false
+                  },
+                  {
+                    "fieldName": "loan_status",
+                    "useForSearch": false
+                  },
+                  {
+                    "fieldName": "outstanding_principal",
+                    "useForSearch": false
+                  },
+                  {
+                    "fieldName": "address_state",
+                    "useForSearch": false
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 12,
+            "height": 7
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
