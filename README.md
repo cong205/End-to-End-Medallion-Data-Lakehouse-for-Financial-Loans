@@ -2,7 +2,7 @@
 
 [![Databricks](https://img.shields.io/badge/Platform-Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)](https://www.databricks.com/)
 [![Apache Spark](https://img.shields.io/badge/Engine-Apache_Spark-E25A1B?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/)
-[![Delta Lake](https://img.shields.io/badge/Storage-Delta_Lake-007ACC?style=for-the-badge&logo=delta&logoColor=white)](https://delta.io/)
+[![NotebookLM](https://img.shields.io/badge/AI_Tool-NotebookLM-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://notebooklm.google/)
 [![Python](https://img.shields.io/badge/Language-Python_3-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 Dự án xây dựng kiến trúc Data Lakehouse từ đầu đến cuối theo mô hình Medallion (Bronze, Silver, Gold) để xử lý ELT và phân tích dữ liệu các khoản vay tài chính dựa trên bộ dữ liệu thực tế của tổ chức cho vay **Lending Club**.
@@ -27,8 +27,8 @@ Hệ thống chịu trách nhiệm tự động hóa hoàn chỉnh luồng xử 
 
 ## Installation and Setup
 > 📝 **Lưu ý:** Trước khi bắt đầu, hãy đảm bảo bạn đã chuẩn bị sẵn một tài khoản **Databricks** (phiên bản Free/Community Edition là đủ).
-
-                Sau khi hoàn thành các bước thiết lập luồng tự động dưới đây, hệ thống sẽ cung cấp dữ liệu sạch cho các tác vụ Machine Learning và Reporting.
+> 
+> Sau khi hoàn thành các bước dưới đây bạn có thể thực hiện machine learning và reporting.
 ### Bước 1: Kết nối GitHub với Databricks
 Để quản lý mã nguồn trực tiếp từ GitHub trên Databricks, bạn cần thiết lập Personal Access Token (PAT):
 1. Trên **GitHub**: Vào `Settings`(settings ở profile) -> `Developer settings` -> `Personal access tokens` -> `Tokens (classic)`.
@@ -53,7 +53,5 @@ Hệ thống chịu trách nhiệm tự động hóa hoàn chỉnh luồng xử 
 
 ### Bước 4: Chạy Pipeline (nhấn run now)
 
-## 🔗 Link Databricks
-https://www.databricks.com/
 ## 🔗 Link dataset from Kaggle 
 https://www.kaggle.com/datasets/adarshsng/lending-club-loan-data-csv
