@@ -2,7 +2,8 @@
 
 [![Databricks](https://img.shields.io/badge/Platform-Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)](https://www.databricks.com/)
 [![Apache Spark](https://img.shields.io/badge/Engine-Apache_Spark-E25A1B?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/)
-[![NotebookLM](https://img.shields.io/badge/AI_Tool-NotebookLM-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://notebooklm.google/)
+[![NotebookLM](https://img.shields.io/badge/Tool-NotebookLM-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://notebooklm.google/)
+[![Kaggle](https://img.shields.io/badge/Dataset-Kaggle-20BEFF?style=for-the-badge&logo=Kaggle&logoColor=white)](https://www.kaggle.com/)
 [![Python](https://img.shields.io/badge/Language-Python_3-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 Dự án xây dựng kiến trúc Data Lakehouse từ đầu đến cuối theo mô hình Medallion (Bronze, Silver, Gold) để xử lý ELT và phân tích dữ liệu các khoản vay tài chính dựa trên bộ dữ liệu thực tế của tổ chức cho vay **Lending Club**.
