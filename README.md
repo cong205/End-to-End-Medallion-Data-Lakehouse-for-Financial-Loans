@@ -1,25 +1,34 @@
 # End-to-End-Medallion-Data-Lakehouse-for-Financial-Loans
+
+[![Databricks](https://img.shields.io/badge/Platform-Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)](https://www.databricks.com/)
+[![Apache Spark](https://img.shields.io/badge/Engine-Apache_Spark-E25A1B?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/)
+[![Delta Lake](https://img.shields.io/badge/Storage-Delta_Lake-007ACC?style=for-the-badge&logo=delta&logoColor=white)](https://delta.io/)
+[![Python](https://img.shields.io/badge/Language-Python_3-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+
 Dự án xây dựng kiến trúc Data Lakehouse từ đầu đến cuối theo mô hình Medallion (Bronze, Silver, Gold) để xử lý ELT và phân tích dữ liệu các khoản vay tài chính dựa trên bộ dữ liệu thực tế của tổ chức cho vay **Lending Club**.
-<img width="1272" height="409" alt="{A3C2718C-ACCF-4870-A4C4-DF6FF15E80B7}" src="https://github.com/user-attachments/assets/cf0a962c-4bb7-41a6-ba4a-d81d7e015424" />
+
+<p align="center">
+  <img width="1272" height="409" alt="Architecture Diagram" src="https://github.com/user-attachments/assets/cf0a962c-4bb7-41a6-ba4a-d81d7e015424" />
+</p>
+
 ## Summary
 ### 1. System Overview
-Hệ thống chịu trách nhiệm tự động hóa luồng xử lý dữ liệu (Data Pipeline). 
+Hệ thống chịu trách nhiệm tự động hóa hoàn chỉnh luồng xử lý dữ liệu (**Data Pipeline**):
+* Tự động trích xuất, biến đổi và tải dữ liệu qua các tầng lưu trữ Delta Lake.
+* Làm sạch, chuẩn hóa dữ liệu thô và thực hiện làm giàu dữ liệu (**Data Enrichment**).
+* Xử lý triệt để các giá trị thiếu (`Null values`), lọc bỏ các thuộc tính/cột không cần thiết nhằm tối ưu hiệu năng cho các thuật toán học máy (**Machine Learning**) và hệ thống báo cáo (**Reporting**).
 
-Làm sạch và làm giàu data, loại bỏ các cột không cần thiết cho ml và report, xử lý các giá trị null,...
 ### 2. Technologies Used
-Data Platform: Databricks
+* **Data Platform:** Databricks
+* **Data Processing & Storage:** Apache Spark (PySpark), Delta Lake
+* **Programming Language:** Python
+* **Development Tools:** Databricks Notebooks, NotebookLM
+* **Data Visualization:** Databricks Dashboard
 
-Data Processing & Storage: Apache Spark (PySpark), Delta Lake
-
-Programming Language: Python
-
-Development Tools: Databricks Notebooks, NotebookLM
-
-Data Visualization: Dashboard
 ## Installation and Setup
-Trước khi bắt đầu, hãy đảm bảo bạn đã chuẩn bị 1 tài khoản **Databricks** (bản free là đủ)
+> 📝 **Lưu ý:** Trước khi bắt đầu, hãy đảm bảo bạn đã chuẩn bị sẵn một tài khoản **Databricks** (phiên bản Free/Community Edition là đủ).
 
-Sau khi hoàn thành các bước dưới đây bạn có thể thưc hiện machine_learning và reporting 
+                Sau khi hoàn thành các bước thiết lập luồng tự động dưới đây, hệ thống sẽ cung cấp dữ liệu sạch cho các tác vụ Machine Learning và Reporting.
 ### Bước 1: Kết nối GitHub với Databricks
 Để quản lý mã nguồn trực tiếp từ GitHub trên Databricks, bạn cần thiết lập Personal Access Token (PAT):
 1. Trên **GitHub**: Vào `Settings`(settings ở profile) -> `Developer settings` -> `Personal access tokens` -> `Tokens (classic)`.
@@ -34,24 +43,17 @@ Sau khi hoàn thành các bước dưới đây bạn có thể thưc hiện mac
 ### Bước 3: Thiết lập Pipeline Tự động hóa
 1. Tại thanh menu bên trái Databricks, chọn **Jobs&Pipelines** -> Bấm nút **`Create Job`**.
 2. Đặt tên cho Job ở góc trên bên trái: `Lending_Club_ELT_Orchestration`.
-3. **Cấu hình Task 1 (Bronze Layer):**
-   * **Task name:** `01_Ingest_to_Bronze`
-   * **Type:** `Notebook`
-   * **Source:** `Workspace`
-   * **Path** Chọn file `Bronze` trong thư mục Git của bạn.
-4. **Cấu hình Task 2 (Silver Layer):**
-   * Bấm nút **`+ Add task`** (nằm ngay dưới Task 1).
-   * **Task name:** `02_Cleanse_to_Silver`
-   * **Depends on:** Chọn `01_Ingest_to_Bronze` 
-   * **Path:** Chọn file `Silver`.
-5. **Cấu hình Task 3 (Gold Layer):**
-   * Bấm nút **`+ Add task`** (nằm dưới Task 2).
-   * **Task name:** `03_Transform_to_Gold`
-   * **Depends on:** Chọn `02_Cleanse_to_Silver`.
-   * **Path:** Chọn file `03_Gold_ETL`.
+3. Tiến hành cấu hình chuỗi các tác vụ (**Tasks**) tuần tự như bảng dưới đây:
+
+| Thứ tự | Tên Task (`Task name`) | Loại (`Type`) | Nguồn (`Source`) | Đường dẫn file (`Path`) | Phụ thuộc (`Depends on`) |
+| :---: | :--- | :--- | :--- | :--- | :--- |
+| **1** | `01_Ingest_to_Bronze` | `Notebook` | `Workspace` | Chọn file `Bronze` trong thư mục Git của bạn | *Không có* |
+| **2** | `02_Cleanse_to_Silver` | `Notebook` | `Workspace` | Chọn file `Silver` trong thư mục Git của bạn | `01_Ingest_to_Bronze` |
+| **3** | `03_Transform_to_Gold` | `Notebook` | `Workspace` | Chọn file `Gold` trong thư mục Git của bạn | `02_Cleanse_to_Silver` |
+
 ### Bước 4: Chạy Pipeline (nhấn run now)
 
-## Link Databricks
+## 🔗 Link Databricks
 https://www.databricks.com/
-## Link dataset from Kaggle 
+## 🔗 Link dataset from Kaggle 
 https://www.kaggle.com/datasets/adarshsng/lending-club-loan-data-csv
